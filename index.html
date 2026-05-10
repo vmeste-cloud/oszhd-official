@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>О.С.Ж.Д. | Official</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #fff;
+            color: #000;
+            font-family: "Palatino Linotype", serif;
+            overflow: hidden; transition: all 0.8s ease;
+        }
+
+        #display { 
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            font-size: 67px;
+            text-align: right;
+            transition: all 0.5s ease;
+            white-space: pre-wrap;
+        }
+
+        #house-container {
+            position: absolute;
+            left: 5%;
+            bottom: 0;
+            width: 40%;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .roof {
+            width: 0; height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 120px solid #f1c40f;
+        }
+
+        .walls {
+            width: 250px;
+            height: 300px;
+            background-color: #f1c40f;
+            border: 2px solid #e1b100;
+        }
+
+        #admin-bar {
+            position: fixed; top: -60px; left: 0; width: 100%; height: 40px;
+            background: rgba(0,0,0,0.05); border-bottom: 1px solid #ccc;
+            display: flex; align-items: center; padding: 0 20px; transition: 0.4s; z-index: 9999;
+        }
+        #admin-bar.active { top: 0; }
+        #cmd { width: 100%; background: transparent; border: none; color: #333; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div id="admin-bar">
+        <input type="text" id="cmd" placeholder="Введите команды (текст:, размер:, цвет:)...">
+    </div>
+
+    <div id="house-container">
+        <div class="roof"></div>
+        <div class="walls"></div>
+    </div>
+
+    <div id="display">ОСЖД</div>
+
+    <script>
+        const bar = document.getElementById('admin-bar');
+        const input = document.getElementById('cmd');
+        const view = document.getElementById('display');
+
+        // Функция применения и СОХРАНЕНИЯ команд
+        function applyAndSave(rawString, save = true) {
+            if (!rawString) return;
+            const parts = rawString.split(';');
+            parts.forEach(p => {
+                const [c, v] = p.split(':').map(s => s?.trim());
+                if (c === 'текст') view.innerText = v.toUpperCase();
+                if (c === 'размер') view.style.fontSize = v + 'px';
+                if (c === 'цвет') view.style.color = v;
+            });
+            // Сохраняем строку команд в память браузера
+            if (save) localStorage.setItem('oszhd_memory', rawString);
+        }
+
+        // Загрузка сохраненных настроек при старте
+        window.onload = () => {
+            const savedData = localStorage.getItem('oszhd_memory');
+            if (savedData) applyAndSave(savedData, false);
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.altKey && e.code === 'KeyS') {
+                bar.classList.toggle('active');
+                if(bar.classList.contains('active')) input.focus();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                applyAndSave(input.value);
+                input.value = "";
+            }
+        });
+    </script>
+</body>
+</html>
