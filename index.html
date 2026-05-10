@@ -2,112 +2,70 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>О.С.Ж.Д. | Official</title>
+    <title>О.С.Ж.Д. | Система v36.0</title>
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #fff;
-            color: #000;
-            font-family: "Palatino Linotype", serif;
-            overflow: hidden; transition: all 0.8s ease;
-        }
-
-        #display { 
-            position: absolute;
-            top: 50px;
-            right: 50px;
-            font-size: 67px;
-            text-align: right;
-            transition: all 0.5s ease;
-            white-space: pre-wrap;
-        }
-
-        #house-container {
-            position: absolute;
-            left: 5%;
-            bottom: 0;
-            width: 40%;
-            height: 90%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        .roof {
-            width: 0; height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-bottom: 120px solid #f1c40f;
-        }
-
-        .walls {
-            width: 250px;
-            height: 300px;
-            background-color: #f1c40f;
-            border: 2px solid #e1b100;
-        }
-
-        #admin-bar {
-            position: fixed; top: -60px; left: 0; width: 100%; height: 40px;
-            background: rgba(0,0,0,0.05); border-bottom: 1px solid #ccc;
-            display: flex; align-items: center; padding: 0 20px; transition: 0.4s; z-index: 9999;
-        }
-        #admin-bar.active { top: 0; }
-        #cmd { width: 100%; background: transparent; border: none; color: #333; outline: none; }
+        :root { --house-y: #f1c40f; --border: #000; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; color: #000; font-family: "Palatino Linotype", serif; overflow: hidden; }
+        #bg-house { position: absolute; left: 50px; bottom: 0; width: 350px; height: 550px; z-index: 1; opacity: 0.9; pointer-events: none; }
+        .bg-roof { border-left: 175px solid transparent; border-right: 175px solid transparent; border-bottom: 130px solid var(--house-y); width:0; height:0; }
+        .bg-walls { width: 350px; height: 420px; background: var(--house-y); border: 2.5px solid var(--border); }
+        #top-label { position: absolute; top: 20px; right: 40px; font-size: 38px; font-weight: bold; z-index: 100; cursor: text; outline: none; }
+        #ui-layer { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; height: 100vh; gap: 30px; }
+        .circle { width: 230px; height: 230px; border: 2px solid #000; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
+        .house-group { position: relative; width: 100px; height: 70px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .m-house { position: relative; width: 40px; height: 35px; background: var(--house-y); border: 1.5px solid #000; z-index: 10; }
+        .m-house::before { content:''; position:absolute; top:-18px; left:-5px; border-left:24px solid transparent; border-right:24px solid transparent; border-bottom:18px solid #000; }
+        .door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 10px; height: 16px; background: #fff; border: 1px solid #000; }
+        .e-left { position: absolute; width: 35px; height: 22px; border: 1px solid #000; background: #fff; left: 10px; bottom: 5px; z-index: 11; }
+        .g-right { position: absolute; width: 30px; height: 45px; border: 1px solid #000; background: #eee; right: 10px; bottom: 8px; transform: rotate(-10deg); z-index: 5; }
+        .reel { position: absolute; width: 38px; height: 38px; border: 2px solid #000; border-radius: 50%; background: radial-gradient(circle, #222 15%, transparent 20%); animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .labels-box { margin-top: 10px; text-align: center; z-index: 20; }
+        .abbr, .desc { cursor: text; outline: none; display: block; }
+        .abbr { font-size: 18px; font-weight: bold; }
+        .desc { font-size: 13px; font-style: italic; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 500; padding: 80px 40px 40px; box-sizing: border-box; overflow-y: auto; }
+        .back-btn { position: fixed; top: 20px; left: 20px; cursor: pointer; background: var(--house-y); padding: 10px 20px; border: 2px solid #000; z-index: 600; font-weight: bold; }
+        #word-tools { position: fixed; top: 0; left: 0; width: 100%; background: #f0f0f0; border-bottom: 2px solid #000; padding: 10px; display: none; justify-content: center; gap: 8px; z-index: 1000; flex-wrap: wrap; align-items: center; }
+        .tool-btn { padding: 5px 10px; cursor: pointer; background: #fff; border: 1px solid #000; font-weight: bold; font-size: 12px; }
+        .tool-btn:hover { background: var(--house-y); }
+        .panel-close { margin-left: 20px; cursor: pointer; font-size: 24px; font-weight: bold; color: #ff0000; }
     </style>
 </head>
 <body>
-
-    <div id="admin-bar">
-        <input type="text" id="cmd" placeholder="Введите команды (текст:, размер:, цвет:)...">
+    <div id="word-tools">
+        <button class="tool-btn" onclick="exec('bold')">B</button><button class="tool-btn" onclick="exec('italic')">I</button>
+        <button class="tool-btn" onclick="exec('underline')">U</button><button class="tool-btn" onclick="exec('justifyLeft')">L</button>
+        <button class="tool-btn" onclick="exec('justifyCenter')">C</button><button class="tool-btn" onclick="exec('justifyRight')">R</button>
+        <button class="tool-btn" onclick="exec('insertUnorderedList')">•</button><select onchange="exec('foreColor', this.value)"><option value="#000">Цвет</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зеленый</option></select>
+        <select onchange="exec('fontSize', this.value)"><option value="3">Размер</option><option value="1">10px</option><option value="3">16px</option><option value="5">24px</option><option value="7">48px</option></select>
+        <button class="tool-btn" style="background:#27ae60; color:#fff;" onclick="saveGZ()">СОХРАНИТЬ</button><span class="panel-close" onclick="closeEditor()">×</span>
     </div>
-
-    <div id="house-container">
-        <div class="roof"></div>
-        <div class="walls"></div>
+    <div id="top-label" contenteditable="true" onblur="saveTxt()">ОСЖД</div>
+    <div id="bg-house"><div class="bg-roof"></div><div class="bg-walls"></div></div>
+    <div id="ui-layer">
+        <div class="circle"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">О.С.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Эмблема</span></div></div>
+        <div class="circle" onclick="openS('s-pzhd')"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">П.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Почта</span></div></div>
+        <div class="circle" onclick="openS('s-gzhd')"><div class="house-group"><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">Г.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Газета</span></div></div>
+        <div class="circle" onclick="openS('s-kzhd')"><div style="position:relative; width:100px; height:100px; pointer-events:none;"><div class="reel" style="top:-12px; left:-12px;"></div><div class="m-house" style="background:#222; position:absolute; left:25px; top:30px;"><div class="door" style="background:#111;"></div></div><div class="reel" style="bottom:-15px; right:-12px;"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">К.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Кино</span></div></div>
     </div>
-
-    <div id="display">ОСЖД</div>
-
+    <div id="s-gzhd" class="overlay"><div class="back-btn" onclick="hAll()">← ГЛАВНАЯ</div><h1 style="text-align:center;">ВЕСТНИК ЖЁЛТОГО ДОМИКА</h1><div id="editor" contenteditable="true" style="min-height:500px; padding:20px; outline:none; border:1px solid #eee;">Пишите статью здесь (Ctrl+Shift+E для меню)...</div></div>
+    <div id="s-pzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НАЗАД</div><h1>ПОЧТА</h1><p>В разработке.</p></div>
+    <div id="s-kzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НАЗАД</div><h1>КИНОТЕАТР</h1><p>В разработке.</p></div>
     <script>
-        const bar = document.getElementById('admin-bar');
-        const input = document.getElementById('cmd');
-        const view = document.getElementById('display');
-
-        // Функция применения и СОХРАНЕНИЯ команд
-        function applyAndSave(rawString, save = true) {
-            if (!rawString) return;
-            const parts = rawString.split(';');
-            parts.forEach(p => {
-                const [c, v] = p.split(':').map(s => s?.trim());
-                if (c === 'текст') view.innerText = v.toUpperCase();
-                if (c === 'размер') view.style.fontSize = v + 'px';
-                if (c === 'цвет') view.style.color = v;
-            });
-            // Сохраняем строку команд в память браузера
-            if (save) localStorage.setItem('oszhd_memory', rawString);
-        }
-
-        // Загрузка сохраненных настроек при старте
+        function exec(c, v=null) { document.execCommand(c, false, v); }
+        function openS(id) { document.getElementById(id).style.display='block'; }
+        function hAll() { document.querySelectorAll('.overlay').forEach(o=>o.style.display='none'); closeEditor(); }
+        function saveTxt() { let data = []; document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>data[i]=el.innerHTML); localStorage.setItem('os_txt', JSON.stringify(data)); }
+        function saveGZ() { localStorage.setItem('os_gz', document.getElementById('editor').innerHTML); alert("Сохранено!"); }
+        function closeEditor() { document.getElementById('word-tools').style.display='none'; }
+        document.addEventListener('keydown', e => {
+            if(e.ctrlKey && e.shiftKey && e.code==='KeyE' && document.getElementById('s-gzhd').style.display==='block') document.getElementById('word-tools').style.display='flex';
+        });
         window.onload = () => {
-            const savedData = localStorage.getItem('oszhd_memory');
-            if (savedData) applyAndSave(savedData, false);
+            const t = JSON.parse(localStorage.getItem('os_txt')); if(t) document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>el.innerHTML=t[i]||el.innerHTML);
+            const g = localStorage.getItem('os_gz'); if(g) document.getElementById('editor').innerHTML = g;
         };
-
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.altKey && e.code === 'KeyS') {
-                bar.classList.toggle('active');
-                if(bar.classList.contains('active')) input.focus();
-            }
-        });
-
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                applyAndSave(input.value);
-                input.value = "";
-            }
-        });
     </script>
 </body>
 </html>
