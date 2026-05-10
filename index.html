@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>О.С.Ж.Д. | Система v36.0</title>
+    <title>О.С.Ж.Д. | Система v37.0</title>
     <style>
         :root { --house-y: #f1c40f; --border: #000; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; color: #000; font-family: "Palatino Linotype", serif; overflow: hidden; }
         #bg-house { position: absolute; left: 50px; bottom: 0; width: 350px; height: 550px; z-index: 1; opacity: 0.9; pointer-events: none; }
         .bg-roof { border-left: 175px solid transparent; border-right: 175px solid transparent; border-bottom: 130px solid var(--house-y); width:0; height:0; }
         .bg-walls { width: 350px; height: 420px; background: var(--house-y); border: 2.5px solid var(--border); }
-        #top-label { position: absolute; top: 20px; right: 40px; font-size: 38px; font-weight: bold; z-index: 100; cursor: text; outline: none; }
+        #top-label { position: absolute; top: 20px; right: 40px; font-size: 38px; font-weight: bold; z-index: 100; cursor: default; outline: none; }
         #ui-layer { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; height: 100vh; gap: 30px; }
         .circle { width: 230px; height: 230px; border: 2px solid #000; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
         .house-group { position: relative; width: 100px; height: 70px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
@@ -21,14 +21,13 @@
         .reel { position: absolute; width: 38px; height: 38px; border: 2px solid #000; border-radius: 50%; background: radial-gradient(circle, #222 15%, transparent 20%); animation: spin 4s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .labels-box { margin-top: 10px; text-align: center; z-index: 20; }
-        .abbr, .desc { cursor: text; outline: none; display: block; }
+        .abbr, .desc { cursor: default; outline: none; display: block; }
         .abbr { font-size: 18px; font-weight: bold; }
         .desc { font-size: 13px; font-style: italic; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 500; padding: 80px 40px 40px; box-sizing: border-box; overflow-y: auto; }
         .back-btn { position: fixed; top: 20px; left: 20px; cursor: pointer; background: var(--house-y); padding: 10px 20px; border: 2px solid #000; z-index: 600; font-weight: bold; }
-        #word-tools { position: fixed; top: 0; left: 0; width: 100%; background: #f0f0f0; border-bottom: 2px solid #000; padding: 10px; display: none; justify-content: center; gap: 8px; z-index: 1000; flex-wrap: wrap; align-items: center; }
-        .tool-btn { padding: 5px 10px; cursor: pointer; background: #fff; border: 1px solid #000; font-weight: bold; font-size: 12px; }
-        .tool-btn:hover { background: var(--house-y); }
+        #word-tools { position: fixed; top: 0; left: 0; width: 100%; background: #f0f0f0; border-bottom: 2px solid #000; padding: 10px; display: none; justify-content: center; gap: 8px; z-index: 1000; align-items: center; }
+        .tool-btn { padding: 5px 10px; cursor: pointer; background: #fff; border: 1px solid #000; font-weight: bold; }
         .panel-close { margin-left: 20px; cursor: pointer; font-size: 24px; font-weight: bold; color: #ff0000; }
     </style>
 </head>
@@ -37,34 +36,36 @@
         <button class="tool-btn" onclick="exec('bold')">B</button><button class="tool-btn" onclick="exec('italic')">I</button>
         <button class="tool-btn" onclick="exec('underline')">U</button><button class="tool-btn" onclick="exec('justifyLeft')">L</button>
         <button class="tool-btn" onclick="exec('justifyCenter')">C</button><button class="tool-btn" onclick="exec('justifyRight')">R</button>
-        <button class="tool-btn" onclick="exec('insertUnorderedList')">•</button><select onchange="exec('foreColor', this.value)"><option value="#000">Цвет</option><option value="red">Красный</option><option value="blue">Синий</option><option value="green">Зеленый</option></select>
-        <select onchange="exec('fontSize', this.value)"><option value="3">Размер</option><option value="1">10px</option><option value="3">16px</option><option value="5">24px</option><option value="7">48px</option></select>
+        <select onchange="exec('foreColor', this.value)"><option value="#000">Цвет</option><option value="red">Красный</option><option value="blue">Синий</option></select>
         <button class="tool-btn" style="background:#27ae60; color:#fff;" onclick="saveGZ()">СОХРАНИТЬ</button><span class="panel-close" onclick="closeEditor()">×</span>
     </div>
-    <div id="top-label" contenteditable="true" onblur="saveTxt()">ОСЖД</div>
+    <div id="top-label">ОСЖД</div>
     <div id="bg-house"><div class="bg-roof"></div><div class="bg-walls"></div></div>
     <div id="ui-layer">
-        <div class="circle"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">О.С.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Эмблема</span></div></div>
-        <div class="circle" onclick="openS('s-pzhd')"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">П.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Почта</span></div></div>
-        <div class="circle" onclick="openS('s-gzhd')"><div class="house-group"><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">Г.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Газета</span></div></div>
-        <div class="circle" onclick="openS('s-kzhd')"><div style="position:relative; width:100px; height:100px; pointer-events:none;"><div class="reel" style="top:-12px; left:-12px;"></div><div class="m-house" style="background:#222; position:absolute; left:25px; top:30px;"><div class="door" style="background:#111;"></div></div><div class="reel" style="bottom:-15px; right:-12px;"></div></div><div class="labels-box"><span class="abbr" contenteditable="true" onblur="saveTxt()">К.Ж.Д.</span><span class="desc" contenteditable="true" onblur="saveTxt()">Кино</span></div></div>
+        <div class="circle"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr">О.С.Ж.Д.</span><span class="desc">Эмблема</span></div></div>
+        <div class="circle" onclick="openS('s-pzhd')"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div></div><div class="labels-box"><span class="abbr">П.Ж.Д.</span><span class="desc">Почта</span></div></div>
+        <div class="circle" onclick="openS('s-gzhd')"><div class="house-group"><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div class="labels-box"><span class="abbr">Г.Ж.Д.</span><span class="desc">Газета</span></div></div>
+        <div class="circle" onclick="openS('s-kzhd')"><div style="position:relative; width:100px; height:100px;"><div class="reel" style="top:-12px; left:-12px;"></div><div class="m-house" style="background:#222; position:absolute; left:25px; top:30px;"><div class="door" style="background:#111;"></div></div><div class="reel" style="bottom:-15px; right:-12px;"></div></div><div class="labels-box"><span class="abbr">К.Ж.Д.</span><span class="desc">Кино</span></div></div>
     </div>
-    <div id="s-gzhd" class="overlay"><div class="back-btn" onclick="hAll()">← ГЛАВНАЯ</div><h1 style="text-align:center;">ВЕСТНИК ЖЁЛТОГО ДОМИКА</h1><div id="editor" contenteditable="true" style="min-height:500px; padding:20px; outline:none; border:1px solid #eee;">Пишите статью здесь (Ctrl+Shift+E для меню)...</div></div>
-    <div id="s-pzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НАЗАД</div><h1>ПОЧТА</h1><p>В разработке.</p></div>
-    <div id="s-kzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НАЗАД</div><h1>КИНОТЕАТР</h1><p>В разработке.</p></div>
+    <div id="s-gzhd" class="overlay"><div class="back-btn" onclick="hAll()">← ГЛАВНАЯ</div><h1 style="text-align:center;">ВЕСТНИК ЖЁЛТОГО ДОМИКА</h1><div id="editor" contenteditable="false" style="min-height:500px; padding:20px; outline:none;">Записей пока нет...</div></div>
+    <div id="s-pzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НА ЗАД</div><h1>ПОЧТА</h1><p>В разработке.</p></div>
+    <div id="s-kzhd" class="overlay"><div class="back-btn" onclick="hAll()">← НА ЗАД</div><h1>КИНОТЕАТР</h1><p>В разработке.</p></div>
     <script>
         function exec(c, v=null) { document.execCommand(c, false, v); }
         function openS(id) { document.getElementById(id).style.display='block'; }
         function hAll() { document.querySelectorAll('.overlay').forEach(o=>o.style.display='none'); closeEditor(); }
-        function saveTxt() { let data = []; document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>data[i]=el.innerHTML); localStorage.setItem('os_txt', JSON.stringify(data)); }
-        function saveGZ() { localStorage.setItem('os_gz', document.getElementById('editor').innerHTML); alert("Сохранено!"); }
-        function closeEditor() { document.getElementById('word-tools').style.display='none'; }
+        function saveGZ() { localStorage.setItem('os_gz', document.getElementById('editor').innerHTML); alert("Архив обновлен!"); }
+        function closeEditor() { document.getElementById('word-tools').style.display='none'; document.getElementById('editor').contentEditable = "false"; document.querySelectorAll('[contenteditable="true"]').forEach(el => el.contentEditable = "false"); }
         document.addEventListener('keydown', e => {
-            if(e.ctrlKey && e.shiftKey && e.code==='KeyE' && document.getElementById('s-gzhd').style.display==='block') document.getElementById('word-tools').style.display='flex';
+            if(e.ctrlKey && e.altKey && e.code==='KeyS') { document.querySelectorAll('.abbr, .desc, #top-label').forEach(el => el.contentEditable = "true"); alert("Правка текста эмблем включена"); }
+            if(e.ctrlKey && e.shiftKey && e.code==='KeyE' && document.getElementById('s-gzhd').style.display==='block') { document.getElementById('word-tools').style.display='flex'; document.getElementById('editor').contentEditable = "true"; }
         });
-        window.onload = () => {
-            const t = JSON.parse(localStorage.getItem('os_txt')); if(t) document.querySelectorAll('[contenteditable="true"]').forEach((el,i)=>el.innerHTML=t[i]||el.innerHTML);
-            const g = localStorage.getItem('os_gz'); if(g) document.getElementById('editor').innerHTML = g;
+        window.onload = () => { 
+            const g = localStorage.getItem('os_gz'); if(g) document.getElementById('editor').innerHTML = g; 
+            document.querySelectorAll('[contenteditable]').forEach(el => el.onblur = () => {
+                let data = []; document.querySelectorAll('.abbr, .desc, #top-label').forEach((el,i)=>data[i]=el.innerHTML); localStorage.setItem('os_txt', JSON.stringify(data));
+            });
+            const t = JSON.parse(localStorage.getItem('os_txt')); if(t) document.querySelectorAll('.abbr, .desc, #top-label').forEach((el,i)=>el.innerHTML=t[i]||el.innerHTML);
         };
     </script>
 </body>
