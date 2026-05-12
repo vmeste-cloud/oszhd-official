@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
+<html><html lang="ru"><head>
     <meta charset="UTF-8">
-    <title>О.С.Ж.Д. | Official v2.0</title>
+    <title>О.С.Ж.Д. | Official v54.0</title>
     <style>
         :root { --house-y: #f1c40f; --border: #000; --gray: #d1d1d1; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; color: #000; font-family: "Palatino Linotype", serif; overflow: hidden; }
@@ -17,7 +16,7 @@
         .m-house::before { content:''; position:absolute; top:-18px; left:-5px; border-left:24px solid transparent; border-right:24px solid transparent; border-bottom:18px solid #000; }
         .door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 10px; height: 16px; background: #fff; border: 1px solid #000; }
         .e-left { position: absolute; width: 35px; height: 22px; border: 1px solid #000; background: #fff; left: 10px; bottom: 5px; z-index: 11; }
-        .g-right { position: absolute; width: 30px; height: 45px; border: 1px solid #000; background: #eee; right: 10px; bottom: 8px; transform: rotate(10deg); z-index: 5; }
+        .g-right { position: absolute; width: 30px; height: 45px; border: 1px solid #000; background: #eee; right: 10px; bottom: 8px; transform: rotate(-10deg); z-index: 5; }
         .reel { position: absolute; width: 38px; height: 38px; border: 2px solid #000; border-radius: 50%; background: radial-gradient(circle, #222 15%, transparent 20%); animation: spin 4s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 500; padding: 80px 40px; box-sizing: border-box; overflow-y: auto; }
@@ -25,15 +24,9 @@
         .admin-bar { position: fixed; top: -140px; left: 0; width: 100%; background: #f0f0f0; border-bottom: 3px solid #000; padding: 15px; display: flex; justify-content: center; gap: 10px; transition: 0.4s; z-index: 10000; align-items: center; }
         .admin-bar.open { top: 0; }
         .red-x { position: absolute; right: 30px; cursor: pointer; font-size: 32px; font-weight: bold; color: #ff0000; }
-        
-        /* КИНОЗАЛ И ВЕЕР */
         #hub-wrap { display: flex; justify-content: center; gap: 120px; margin-top: 150px; align-items: center; }
         .hub-box { width: 180px; height: 250px; background: var(--gray); border-radius: 15px; border: 2px solid #000; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; z-index: 5; }
-        /* ЭФФЕКТ ВЕЕРА */
-        .stack-layer { position: absolute; width: 100%; height: 100%; background: #bbb; border: 2px solid #000; border-radius: 15px; z-index: -1; transition: 0.3s; }
-        .layer-1 { transform: translate(12%, -8%) rotate(4deg); background: #c5c5c5; } /* виден на ~17% */
-        .layer-2 { transform: translate(24%, -16%) rotate(8deg); background: #d0d0d0; }
-        
+        .stack-layer { position: absolute; width: 100%; height: 100%; background: #bbb; border: 2px solid #000; border-radius: 15px; z-index: -1; }
         .grid-25 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 1000px; margin: 0 auto; }
         .card { background: var(--gray); height: 100px; border-radius: 10px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 5px; text-align: center; cursor: pointer; font-weight: bold; }
         .card.selected { border: 3px solid #4285F4; background: #fff; }
@@ -42,48 +35,39 @@
     </style>
 </head>
 <body>
-    <!-- Админки -->
-    <div id="bar-film" class="admin-bar"><input type="text" id="f-name" placeholder="Название"><input type="text" id="f-link" placeholder="Ссылка (для фильмов)"><button onclick="saveToCard()" style="background:#27ae60; color:#fff; padding:10px;">ЗАПИСАТЬ</button><button onclick="deleteCard()" style="background:#e74c3c; color:#fff; padding:10px;">УДАЛИТЬ</button><span class="red-x" onclick="this.parentElement.classList.remove('open')">×</span></div>
-    <div id="bar-editor" class="admin-bar"><button onclick="exec('bold')"><b>B</b></button><button onclick="let url=prompt('Ссылка:');exec('createLink',url)">🔗</button><button onclick="addMovieButton()" style="background:#4285F4; color:#fff;">[+] КНОПКА</button><button onclick="saveArchive()" style="background:#27ae60; color:#fff; padding:5px 15px;">В АРХИВ</button><span class="red-x" onclick="closeEditors()">×</span></div>
+    <div id="bar-main" class="admin-bar open">
+        <button onclick="exportFullCode()" style="background:#4285F4; color:#fff; border:none; padding:12px; font-weight:bold; cursor:pointer;">СКАЧАТЬ ВЕСЬ САЙТ (ДЛЯ ГИТХАБА)</button>
+        <span class="red-x" onclick="this.parentElement.classList.remove('open')">×</span>
+    </div>
+    <div id="bar-film" class="admin-bar"><input type="text" id="f-name" placeholder="Название"><input type="text" id="f-link" placeholder="Ссылка"><button onclick="saveToCard()" style="background:#27ae60; color:#fff; padding:10px;">ЗАПИСАТЬ</button><button onclick="deleteCard()" style="background:#e74c3c; color:#fff; padding:10px;">УДАЛИТЬ</button></div>
+    <div id="bar-editor" class="admin-bar"><button onclick="exec('bold')">B</button><button onclick="addMovieButton()" style="background:#4285F4; color:#fff;">[+] КНОПКА</button><button onclick="saveArchive()" style="background:#27ae60; color:#fff; padding:5px 15px;">В АРХИВ</button><span class="red-x" onclick="closeEditors()">×</span></div>
 
-    <!-- Главная -->
     <div id="top-label">ОСЖД</div>
     <div id="bg-house"><div class="bg-roof"></div><div class="bg-walls"></div></div>
     <div id="ui-layer">
-        <div class="circle" style="cursor:default;"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div style="margin-top:10px;text-align:center;"><b>О.С.Ж.Д.</b><br><small>(Эмблема) </small></div></div>
+        <div class="circle" style="cursor:default;"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div style="margin-top:10px;text-align:center;"><b>О.С.Ж.Д.</b><br><small>(Эмблема)</small></div></div>
         <div class="circle" onclick="openS('s-pzhd')"><div class="house-group"><div class="e-left"></div><div class="m-house"><div class="door"></div></div></div><div style="margin-top:10px;text-align:center;"><b>П.Ж.Д.</b><br><small>(Почта)</small></div></div>
         <div class="circle" onclick="openS('s-gzhd')"><div class="house-group"><div class="m-house"><div class="door"></div></div><div class="g-right"></div></div><div style="margin-top:10px;text-align:center;"><b>Г.Ж.Д.</b><br><small>(Газета)</small></div></div>
         <div class="circle" onclick="openS('s-kzhd')"><div style="position:relative; width:100px; height:100px; pointer-events:none;"><div class="reel" style="top:-12px; left:-12px;"></div><div class="m-house" style="background:#222; position:absolute; left:25px; top:30px;"><div class="door" style="background:#111;"></div></div><div class="reel" style="bottom:-15px; right:-12px;"></div></div><div style="margin-top:10px;text-align:center;"><b>К.Ж.Д.</b><br><small>(Кино)</small></div></div>
     </div>
 
-    <!-- Разделы -->
-    <div id="s-gzhd" class="overlay"><div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div><h1 style="text-align:center;">ВЕСТНИК ЖЁЛТОГО ДОМИКА</h1><div id="ed-news" class="sheet" contenteditable="false">Записей нет...</div></div>
-    <div id="s-pzhd" class="overlay"><div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div><h1>ПОЧТА П.Ж.Д.</h1><p>В разработке.</p></div>
-    
-    <div id="s-kzhd" class="overlay">
-        <div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div>
-        <h1 style="text-align:center;">К.Ж.Д. | ВЫБОР ЗАЛА</h1>
-        <div id="hub-wrap">
-            <div class="hub-box" onclick="showGrid('movies')"><b style="font-size:24px;">ФИЛЬМЫ</b></div>
-            <div class="hub-box" onclick="showGrid('series')">
-                <div class="stack-layer layer-1"></div>
-                <div class="stack-layer layer-2"></div>
-                <b style="font-size:24px;">СЕРИАЛЫ</b>
-            </div>
-        </div>
-    </div>
+    <div id="s-gzhd" class="overlay" style="display: none;"><div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div><h1 style="text-align:center;">ВЕСТНИК ЖЁЛТОГО ДОМИКА</h1><div id="ed-news" class="sheet" contenteditable="false">Записей нет...</div></div>
+    <div id="s-pzhd" class="overlay" style="display: none;"><div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div><h1>ПОЧТА П.Ж.Д.</h1><p>В разработке.</p></div>
+    <div id="s-kzhd" class="overlay" style="display: none;"><div class="back-btn" onclick="hAll()">НА ГЛАВНУЮ</div><h1 style="text-align:center;">К.Ж.Д. | ВЫБОР ЗАЛА</h1><div id="hub-wrap"><div class="hub-box" onclick="showGrid('movies')"><b style="font-size:24px;">ФИЛЬМЫ</b></div><div class="hub-box" onclick="showGrid('series')"><div class="stack-layer" style="transform: translate(12%, -8%) rotate(4deg);"></div><div class="stack-layer" style="transform: translate(24%, -16%) rotate(8deg);"></div><b style="font-size:24px;">СЕРИАЛЫ</b></div></div></div>
+    <div id="grid-view" class="overlay" style="display: none;"><div class="back-btn" id="grid-back">НА ГЛАВНУЮ</div><h1 id="grid-title" style="text-align:center;">ЗАЛ СЕРИАЛОВ</h1><div class="grid-25" id="grid-box"><div class="card">Вольф Мессинг видевший сквозь время</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div><div class="card">[ ПУСТО ]</div></div></div>
+    <div id="series-content" class="overlay" style="display: none;"><div class="back-btn" onclick="backToS()">К СЕРИАЛАМ</div><h1 id="ser-title" style="text-align:center;"></h1><div id="ed-series" class="sheet" contenteditable="false"></div></div>
 
-    <div id="grid-view" class="overlay"><div class="back-btn" id="grid-back">НА ГЛАВНУЮ</div><h1 id="grid-title" style="text-align:center;"></h1><div class="grid-25" id="grid-box"></div></div>
-    <div id="series-content" class="overlay"><div class="back-btn" onclick="backToS()">К СЕРИАЛАМ</div><h1 id="ser-title" style="text-align:center;"></h1><div id="ed-series" class="sheet" contenteditable="false"></div></div>
-
-    <script>
-        let db = JSON.parse(localStorage.getItem('os_v51')) || { movies: Array(25).fill(null), series: Array(25).fill(null) };
+    <script id="data-script">
+        /* ХРАНИЛИЩЕ ДАННЫХ ВНУТРИ КОДА */
+        let db = {"movies":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"series":[{"name":"Вольф Мессинг видевший сквозь время","link":"","content":"&nbsp; &nbsp;<a href=\"https://1024terabox.com/s/1ep8OEWY48aaNYrJFI0PBnQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">1-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/17YYTaN7OSxqOHj4qHSgH1Q\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">2-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/1nhILU1OpV8IlyOHgj77xQQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">3-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/12sSQ3KcOlSWpNRX-KVRC-Q\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">4-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/1RHlo5gzRC6HMoxDj51EEgg\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">5-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/1r_HirxLGx7QKKcMH-RgkBg\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">6-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/11LmVpbUMQX2hljOQyGw9xQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">7-ая серия</a>&nbsp;<a href=\"https://1024terabox.com/s/1HzShzxqvCsSfthWqzjc5HA\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">8-ая серия</a>&nbsp;<div><a href=\"https://1024terabox.com/s/1QdKbpVZf-nsCLNpNDiif4Q\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">9-ая серия</a><a href=\"https://1024terabox.com/s/1oNBptDMdHT-62E3Ab0hwtQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">10-ая серия</a><a href=\"https://1024terabox.com/s/1zc6P2GoreHtQP-dRmjW6lA\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">11-ая серия</a><a href=\"https://1024terabox.com/s/1-fF8tfB6QBcvsaiK84KfIQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">12-ая серия</a><a href=\"https://1024terabox.com/s/1yIntp1djzPZQyw-HodUuHA\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">13-ая серия</a><a href=\"https://1024terabox.com/s/18QswgUg6xlx0I36mB1kKfQ\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">14-ая серия</a><a href=\"https://1024terabox.com/s/1qGraEd8jC7symciXKAV2Uw\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">15-ая серия</a><a href=\"https://1024terabox.com/s/1OImesbTpk_H-4DMVdj_S4A\" target=\"_blank\" class=\"movie-link-btn\" contenteditable=\"false\" style=\"background: none 0% 0% / auto repeat scroll padding-box border-box rgb(241, 196, 15);\">16-ая серия</a></div>"},null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]};
         let curCtx = '', curIdx = -1, curSerID = -1;
+
         function exec(c, v=null) { document.execCommand(c, false, v); }
         function openS(id) { document.getElementById(id).style.display='block'; }
         function hAll() { document.querySelectorAll('.overlay').forEach(o=>o.style.display='none'); closeEditors(); }
         function closeEditors() { document.querySelectorAll('.admin-bar').forEach(b=>b.classList.remove('open')); document.querySelectorAll('.sheet').forEach(e=>e.contentEditable="false"); }
         function backToS() { hAll(); showGrid('series'); }
+
         function showGrid(type) {
             hAll(); openS('grid-view'); curCtx = type;
             const box = document.getElementById('grid-box'); box.innerHTML = '';
@@ -97,24 +81,61 @@
                 }; box.appendChild(div);
             });
         }
-        function openSeriesSheet(id) { hAll(); openS('series-content'); curSerID = id; document.getElementById('ser-title').innerText = db.series[id].name; document.getElementById('ed-series').innerHTML = db.series[id].content || "Белый лист. Нажми Ctrl+Shift+E..."; }
-        function addMovieButton() { const txt = prompt("Имя:","1-ая серия"), url = prompt("URL:"); if(txt&&url){ document.execCommand('insertHTML', false, `<a href="${url}" target="_blank" class="movie-link-btn" contenteditable="false">${txt}</a> `); } }
-        function saveArchive() {
-            if (document.getElementById('s-gzhd').style.display === 'block') localStorage.setItem('os_gz_v51', document.getElementById('ed-news').innerHTML);
-            if (document.getElementById('series-content').style.display === 'block') { db.series[curSerID].content = document.getElementById('ed-series').innerHTML; localStorage.setItem('os_v51', JSON.stringify(db)); }
-            alert("Сохранено!");
+
+        function openSeriesSheet(id) {
+            hAll(); openS('series-content'); curSerID = id;
+            document.getElementById('ser-title').innerText = db.series[id].name;
+            document.getElementById('ed-series').innerHTML = db.series[id].content || "Белый лист. Нажми Ctrl+Shift+E...";
         }
-        function saveToCard() { const n = document.getElementById('f-name').value, l = document.getElementById('f-link').value; if(curIdx!==-1&&n){ db[curCtx][curIdx]={name:n, link:l, content:(db[curCtx][curIdx]?.content||"")}; localStorage.setItem('os_v51',JSON.stringify(db)); showGrid(curCtx); } }
-        function deleteCard() { if(curIdx!==-1){ db[curCtx][curIdx]=null; localStorage.setItem('os_v51',JSON.stringify(db)); showGrid(curCtx); } }
+
+        function saveArchive() {
+            if (document.getElementById('s-gzhd').style.display === 'block') localStorage.setItem('os_gz', document.getElementById('ed-news').innerHTML);
+            if (document.getElementById('series-content').style.display === 'block') { db.series[curSerID].content = document.getElementById('ed-series').innerHTML; localStorage.setItem('os_db', JSON.stringify(db)); }
+            alert("Сохранено локально! Теперь скачайте файл для GitHub.");
+        }
+
+        function saveToCard() {
+            const n = document.getElementById('f-name').value, l = document.getElementById('f-link').value;
+            if (curIdx !== -1 && n) { db[curCtx][curIdx] = {name: n, link: l, content: (db[curCtx][curIdx]?.content || "")}; localStorage.setItem('os_db', JSON.stringify(db)); showGrid(curCtx); }
+        }
+
+        function deleteCard() { if (curIdx !== -1) { db[curCtx][curIdx] = null; localStorage.setItem('os_db', JSON.stringify(db)); showGrid(curCtx); } }
+
+        function exportFullCode() {
+            const newsContent = document.getElementById('ed-news').innerHTML;
+            let currentHTML = document.documentElement.outerHTML;
+            // Вшиваем актуальную базу данных в код файла
+            const dataToSave = `let db = ${JSON.stringify(db)};`;
+            currentHTML = currentHTML.replace(/let db = \{.*?\};/, dataToSave);
+            // Вшиваем содержимое газеты
+            currentHTML = currentHTML.replace(/id="ed-news".*?>.*?<\/div>/, `id="ed-news" class="sheet" contenteditable="false">${newsContent}</div>`);
+            
+            const blob = new Blob([`<!DOCTYPE html>\n<html>${currentHTML}</html>`], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'index.html';
+            a.click();
+        }
+
         document.addEventListener('keydown', e => {
-            if(e.ctrlKey && e.altKey && e.code==='KeyA') document.getElementById('bar-film').classList.toggle('open');
-            if(e.ctrlKey && e.shiftKey && e.code==='KeyE') {
-                const isGZ = document.getElementById('s-gzhd').style.display === 'block';
-                const isSR = document.getElementById('series-content').style.display === 'block';
-                if(isGZ||isSR){ document.getElementById('bar-editor').classList.add('open'); (isGZ?document.getElementById('ed-news'):document.getElementById('ed-series')).contentEditable="true"; }
+            if(e.ctrlKey && e.altKey && e.code === 'KeyS') document.getElementById('bar-main').classList.toggle('open');
+            if(e.ctrlKey && e.altKey && e.code === 'KeyA') document.getElementById('bar-film').classList.toggle('open');
+            if(e.ctrlKey && e.shiftKey && e.code === 'KeyE') {
+                const isGZ = document.getElementById('s-gzhd').style.display === 'block', isSR = document.getElementById('series-content').style.display === 'block';
+                if(isGZ || isSR) { document.getElementById('bar-editor').classList.add('open'); (isGZ ? document.getElementById('ed-news') : document.getElementById('ed-series')).contentEditable = "true"; }
             }
         });
-        window.onload = () => { if(localStorage.getItem('os_gz_v51')) document.getElementById('ed-news').innerHTML = localStorage.getItem('os_gz_v51'); };
+
+        window.onload = () => {
+            const savedDb = localStorage.getItem('os_db'); if(savedDb) db = JSON.parse(savedDb);
+            const savedGz = localStorage.getItem('os_gz'); if(savedGz) document.getElementById('ed-news').innerHTML = savedGz;
+        };
+
+        function addMovieButton() {
+            const txt = prompt("Имя:","1-ая серия"), url = prompt("URL:");
+            if(txt && url) document.execCommand('insertHTML', false, `<a href="${url}" target="_blank" class="movie-link-btn" contenteditable="false">${txt}</a> `);
+        }
     </script>
-</body>
-</html>
+
+
+</body></html></html>
